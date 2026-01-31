@@ -33,7 +33,6 @@ public class RateLimitingFilter extends OncePerRequestFilter {
     @Override
     protected boolean shouldNotFilter(HttpServletRequest request) {
         String path = request.getRequestURI();
-        // Don't rate limit Swagger docs and health endpoints
         return path.startsWith("/swagger-ui") ||
                 path.startsWith("/v3/api-docs") ||
                 path.equals("/error");
@@ -49,7 +48,6 @@ public class RateLimitingFilter extends OncePerRequestFilter {
         Bucket bucket = buckets.computeIfAbsent(clientId, this::createNewBucket);
 
         if (bucket.tryConsume(1)) {
-            // Add rate limit headers
             response.addHeader("X-Rate-Limit-Remaining",
                     String.valueOf(bucket.getAvailableTokens()));
             filterChain.doFilter(request, response);
@@ -70,15 +68,11 @@ public class RateLimitingFilter extends OncePerRequestFilter {
     }
 
     private String getClientIdentifier(HttpServletRequest request) {
-        // Use JWT subject (user ID) if authenticated, otherwise use IP
         String authHeader = request.getHeader("Authorization");
         if (authHeader != null && authHeader.startsWith("Bearer ")) {
-            // For authenticated requests, rate limit per user
-            // We'll use the auth header hash as identifier
             return "user:" + authHeader.hashCode();
         }
 
-        // For unauthenticated requests, rate limit per IP
         String xForwardedFor = request.getHeader("X-Forwarded-For");
         if (xForwardedFor != null && !xForwardedFor.isEmpty()) {
             return "ip:" + xForwardedFor.split(",")[0].trim();

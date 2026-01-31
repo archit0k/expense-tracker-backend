@@ -52,7 +52,6 @@ public class FileUpload {
         this.uploadedAt = LocalDateTime.now();
     }
 
-    // Getters
     public Long getId() {
         return id;
     }
@@ -89,7 +88,6 @@ public class FileUpload {
         return uploadedAt;
     }
 
-    // Setters
     public void setOriginalFilename(String originalFilename) {
         this.originalFilename = originalFilename;
     }

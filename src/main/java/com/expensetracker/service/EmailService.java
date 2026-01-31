@@ -63,7 +63,6 @@ public class EmailService {
                 logger.error("Failed to send email to {}: {}", to, e.getMessage());
             }
         } else {
-            // Development mode - log email instead of sending
             logger.info("=== EMAIL (Dev Mode) ===");
             logger.info("To: {}", to);
             logger.info("Subject: {}", subject);

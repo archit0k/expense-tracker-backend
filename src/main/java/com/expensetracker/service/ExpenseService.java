@@ -73,7 +73,6 @@ public class ExpenseService {
             throw new ResourceNotFoundException("Expense not found with id: " + id);
         }
 
-        // Update only non-null fields (partial update)
         if (request.getAmount() != null) {
             expense.setAmount(request.getAmount());
         }

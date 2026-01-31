@@ -67,12 +67,10 @@ public class FileStorageService {
     public FileUploadResponse uploadFile(MultipartFile file, Long expenseId) throws IOException {
         User user = getCurrentUser();
 
-        // Validate file
         if (file.isEmpty()) {
             throw new IllegalArgumentException("Cannot upload empty file");
         }
 
-        // Generate unique filename
         String originalFilename = file.getOriginalFilename();
         String extension = "";
         if (originalFilename != null && originalFilename.contains(".")) {
@@ -80,11 +78,9 @@ public class FileStorageService {
         }
         String storedFilename = UUID.randomUUID().toString() + extension;
 
-        // Save file to disk
         Path targetPath = uploadPath.resolve(storedFilename);
         Files.copy(file.getInputStream(), targetPath, StandardCopyOption.REPLACE_EXISTING);
 
-        // Create database record
         FileUpload fileUpload = new FileUpload();
         fileUpload.setOriginalFilename(originalFilename);
         fileUpload.setStoredFilename(storedFilename);
@@ -93,7 +89,6 @@ public class FileStorageService {
         fileUpload.setFilePath(targetPath.toString());
         fileUpload.setUser(user);
 
-        // Link to expense if provided
         if (expenseId != null) {
             Expense expense = expenseRepository.findByIdAndUser(expenseId, user);
             if (expense != null) {
@@ -150,11 +145,9 @@ public class FileStorageService {
             throw new ResourceNotFoundException("File not found with id: " + fileId);
         }
 
-        // Delete file from disk
         Path filePath = Paths.get(fileUpload.getFilePath());
         Files.deleteIfExists(filePath);
 
-        // Delete database record
         fileUploadRepository.delete(fileUpload);
     }
 

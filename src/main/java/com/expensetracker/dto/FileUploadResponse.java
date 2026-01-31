@@ -21,7 +21,6 @@ public class FileUploadResponse {
         this.uploadedAt = uploadedAt;
     }
 
-    // Getters
     public Long getId() {
         return id;
     }
