@@ -8,6 +8,7 @@ import com.expensetracker.dto.RegisterRequest;
 import com.expensetracker.model.Role;
 import com.expensetracker.model.User;
 import com.expensetracker.repository.UserRepository;
+import com.expensetracker.util.JwtUtil;
 
 @Service
 public class AuthService {
@@ -15,10 +16,16 @@ public class AuthService {
     private final UserRepository userRepository;
     private final PasswordEncoder passwordEncoder;
 
-    public AuthService(UserRepository userRepository, PasswordEncoder passwordEncoder) {
+    private final JwtUtil jwtUtil;
+
+    public AuthService(UserRepository userRepository,
+                       PasswordEncoder passwordEncoder,
+                       JwtUtil jwtUtil) {
         this.userRepository = userRepository;
         this.passwordEncoder = passwordEncoder;
+        this.jwtUtil = jwtUtil;
     }
+
 
     public void register(RegisterRequest request) {
         if (userRepository.findByEmail(request.getEmail()).isPresent()) {
@@ -34,12 +41,15 @@ public class AuthService {
         userRepository.save(user);
     }
 
-    public void login(LoginRequest request) {
+    public String login(LoginRequest request) {
         User user = userRepository.findByEmail(request.getEmail())
                 .orElseThrow(() -> new RuntimeException("Invalid credentials"));
 
         if (!passwordEncoder.matches(request.getPassword(), user.getPassword())) {
             throw new RuntimeException("Invalid credentials");
         }
+
+        return jwtUtil.generateToken(user.getId(), user.getRole().name());
     }
+
 }
