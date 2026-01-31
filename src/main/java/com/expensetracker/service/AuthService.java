@@ -5,6 +5,8 @@ import org.springframework.stereotype.Service;
 
 import com.expensetracker.dto.LoginRequest;
 import com.expensetracker.dto.RegisterRequest;
+import com.expensetracker.exception.EmailAlreadyExistsException;
+import com.expensetracker.exception.InvalidCredentialsException;
 import com.expensetracker.model.Role;
 import com.expensetracker.model.User;
 import com.expensetracker.repository.UserRepository;
@@ -29,7 +31,7 @@ public class AuthService {
 
     public void register(RegisterRequest request) {
         if (userRepository.findByEmail(request.getEmail()).isPresent()) {
-            throw new RuntimeException("Email already registered");
+            throw new EmailAlreadyExistsException("Email already registered");
         }
 
         User user = new User();
@@ -43,10 +45,10 @@ public class AuthService {
 
     public String login(LoginRequest request) {
         User user = userRepository.findByEmail(request.getEmail())
-                .orElseThrow(() -> new RuntimeException("Invalid credentials"));
+                .orElseThrow(() -> new InvalidCredentialsException("Invalid credentials"));
 
         if (!passwordEncoder.matches(request.getPassword(), user.getPassword())) {
-            throw new RuntimeException("Invalid credentials");
+            throw new InvalidCredentialsException("Invalid credentials");
         }
 
         return jwtUtil.generateToken(user.getId(), user.getRole().name());
