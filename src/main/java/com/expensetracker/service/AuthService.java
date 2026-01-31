@@ -17,17 +17,18 @@ public class AuthService {
 
     private final UserRepository userRepository;
     private final PasswordEncoder passwordEncoder;
-
     private final JwtUtil jwtUtil;
+    private final EmailService emailService;
 
     public AuthService(UserRepository userRepository,
-                       PasswordEncoder passwordEncoder,
-                       JwtUtil jwtUtil) {
+            PasswordEncoder passwordEncoder,
+            JwtUtil jwtUtil,
+            EmailService emailService) {
         this.userRepository = userRepository;
         this.passwordEncoder = passwordEncoder;
         this.jwtUtil = jwtUtil;
+        this.emailService = emailService;
     }
-
 
     public void register(RegisterRequest request) {
         if (userRepository.findByEmail(request.getEmail()).isPresent()) {
@@ -41,6 +42,9 @@ public class AuthService {
         user.setRole(Role.USER);
 
         userRepository.save(user);
+
+        // Send welcome email
+        emailService.sendWelcomeEmail(user.getEmail(), user.getName());
     }
 
     public String login(LoginRequest request) {

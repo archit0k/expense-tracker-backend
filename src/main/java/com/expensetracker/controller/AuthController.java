@@ -11,10 +11,15 @@ import com.expensetracker.dto.LoginRequest;
 import com.expensetracker.dto.RegisterRequest;
 import com.expensetracker.service.AuthService;
 
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 
 @RestController
 @RequestMapping("/auth")
+@Tag(name = "Authentication", description = "User authentication and registration APIs")
 public class AuthController {
 
     private final AuthService authService;
@@ -23,12 +28,23 @@ public class AuthController {
         this.authService = authService;
     }
 
+    @Operation(summary = "Register a new user", description = "Creates a new user account and sends a welcome email")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "201", description = "User registered successfully"),
+            @ApiResponse(responseCode = "400", description = "Invalid input data"),
+            @ApiResponse(responseCode = "409", description = "Email already registered")
+    })
     @PostMapping("/register")
     @ResponseStatus(HttpStatus.CREATED)
     public void register(@Valid @RequestBody RegisterRequest request) {
         authService.register(request);
     }
 
+    @Operation(summary = "Login user", description = "Authenticates user and returns a JWT token")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Login successful, JWT token returned"),
+            @ApiResponse(responseCode = "401", description = "Invalid credentials")
+    })
     @PostMapping("/login")
     public String login(@Valid @RequestBody LoginRequest request) {
         return authService.login(request);

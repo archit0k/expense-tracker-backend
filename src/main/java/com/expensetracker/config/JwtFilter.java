@@ -1,9 +1,10 @@
 package com.expensetracker.config;
 
 import java.io.IOException;
-import java.util.Collections;
+import java.util.List;
 
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.web.authentication.WebAuthenticationDetailsSource;
 import org.springframework.web.filter.OncePerRequestFilter;
@@ -26,8 +27,7 @@ public class JwtFilter extends OncePerRequestFilter {
 
     @Override
     protected boolean shouldNotFilter(HttpServletRequest request) {
-        String path = request.getRequestURI();
-        return path.startsWith("/auth/");
+        return request.getRequestURI().startsWith("/auth/");
     }
 
     @Override
@@ -43,11 +43,13 @@ public class JwtFilter extends OncePerRequestFilter {
             String token = header.substring(7);
             Claims claims = jwtUtil.validateToken(token);
 
+            String role = claims.get("role", String.class);
+
             UsernamePasswordAuthenticationToken auth =
                     new UsernamePasswordAuthenticationToken(
                             claims.getSubject(),
                             null,
-                            Collections.emptyList()
+                            List.of(new SimpleGrantedAuthority("ROLE_" + role))
                     );
 
             auth.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
