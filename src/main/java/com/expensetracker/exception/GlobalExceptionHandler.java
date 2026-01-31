@@ -41,7 +41,7 @@ public class GlobalExceptionHandler {
     }
 
     @ExceptionHandler(MaxUploadSizeExceededException.class)
-    @ResponseStatus(HttpStatus.PAYLOAD_TOO_LARGE)
+    @ResponseStatus(HttpStatus.CONTENT_TOO_LARGE)
     public Map<String, String> handleMaxUploadSize(MaxUploadSizeExceededException ex) {
         return Map.of("message", "File size exceeds the maximum allowed size of 10MB");
     }
