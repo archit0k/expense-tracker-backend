@@ -1,0 +1,32 @@
+# Maven
+/target/
+.mvn/wrapper/maven-wrapper.jar
+
+# Spring / Logs
+*.log
+
+# Environment variables
+.env
+
+# IntelliJ IDEA
+.idea/
+*.iml
+*.ipr
+*.iws
+
+# VS Code
+.vscode/
+
+# Eclipse / STS
+.classpath
+.project
+.settings/
+.springBeans
+.sts4-cache/
+
+# NetBeans
+/nbproject/private/
+build/
+
+# OS files
+.DS_Store
